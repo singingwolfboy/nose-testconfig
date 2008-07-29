@@ -1,0 +1,184 @@
+==========
+testconfig
+==========
+
+.. contents::
+
+About
+------------------
+
+Written by Jesse Noller  
+Licensed under the Apache Software License, 2.0
+
+You can install it with ``easy_install nose-testconfig``
+
+What It Does
+------------
+
+nose-testconfig is a plugin to the nose test framework which provides a
+faculty for passing test-specific (or test-run specific) configuration data
+to the tests being executed.
+
+Currently configuration files in the following formats are supported:
+* YAML (via `Pyyaml <http://pypi.python.org/pypi/PyYAML/>`)
+* INI (via `ConfigParser <http://docs.python.org/lib/module-ConfigParser.html>`)
+* Pure Python (via Exec)
+
+The plugin is ``meant`` to be flexible, ergo the support of exec'ing arbitrary
+python files as configuration files with no checks. The default format is 
+assumed to be ConfigParser ini-style format.
+
+The plugin provides a method of overriding certain parameters from the command 
+line (assuming that the main "config" object is a dict) and can easily have 
+additional parsers added to it.
+
+``Warning``: By default, when parsing ini-style files, the value in the 
+key = value pair is loaded via an eval() statement - this is designed so that 
+you can put python lists or dictionaries into the values and have them parsed
+into actual data structures. This may not be desirable for some as it is both
+dangerous, and forces values to be valid python syntax.
+
+Test Usage
+----------
+
+For now (until something better comes along) tests can import the "config" 
+singleton from testconfig:
+
+    from testconfig import config
+
+By default, YAML files parse into a nested dictionary, and ConfigParser ini
+files are also collapsed into a nested dictionary for foo[bar][baz] style
+access. Tests can obviously access configuration data by referencing the 
+relevant dictionary keys:
+
+    from testconfig import config
+    def test_foo():
+        target_server_ip = config['servers']['webapp_ip']
+
+``Warning``: Given this is just a dictionary singleton, tests can easily write
+into the configuration. This means that your tests can write into the config
+space and possibly alter it. This also means that threaded access into the
+configuration can be interesting.
+
+When using pure python configuration - obviously the "sky is the the limit" - 
+given that the configuration is loaded via an exec, you could potentially
+modify nose, the plugin, etc. However, if you do not export a config{} dict
+as part of your python code, you obviously won't be able to import the 
+config object from testconfig.
+
+When using YAML-style configuration, you get a lot of the power of pure python
+without the danger of unprotected exec() - you can obviously use the pyaml 
+python-specific objects and all of the other YAML creamy goodness.
+
+Defining a configuration file
+-----------------------------
+
+Simple ConfigParser style:
+
+    [myapp_servers]
+    main_server = 10.1.1.1
+    secondary_server = 10.1.1.2
+
+So your tests access the config options like this:
+
+    from testconfig import config
+    def test_foo():
+        main_server = config['myapp_servers']['main_server']
+        
+If you wanted, you could set main_server to be a list named "main_servers"
+like this: main_servers = ['10.1.1.1', '10.2.1.1'] - this would in turn be
+eval'ed into a proper python list.
+
+YAML style configuration:
+    myapp:
+        servers:
+            main_server: 10.1.1.1
+            secondary_server: 10.1.1.2
+
+And your tests can access it thus:
+
+    from testconfig import config
+    def test_foo():
+        main_server = config['myapp']['servers']['main_server']
+
+Python configuration file:
+
+    import socket
+
+    global config
+    config = {}
+    possible_main_servers = ['10.1.1.1', '10.1.1.2']
+
+    for srv in possible_main_servers:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((srv, 80))
+        except:
+            continue
+        s.close()
+        config['main_server'] = srv
+        break
+
+And lo, the config is thus:
+
+    from testconfig import config
+    def test_foo():
+        main_server = config['main_server']
+
+
+Command line options
+--------------------
+
+After it is installed, the plugin adds the following command line flags to 
+nosetests:
+
+    --tc-file=TESTCONFIG  Configuration file to parse and pass to tests
+                          [NOSE_TEST_CONFIG_FILE]
+                          
+    --tc-format=TESTCONFIGFORMAT  Test config file format, default is   
+                                  configparser ini format
+                                  [NOSE_TEST_CONFIG_FILE_FORMAT]
+
+    --tc=OVERRIDES        Option:Value specific overrides.
+
+
+Passing in an INI configuration file:
+
+    $ nosetests -s --tc-file example_cfg.ini
+
+Passing in a YAML configuration file:
+
+    $ nosetests -s --tc-file example_cfg.yaml --tc-format yaml
+
+Passing in a Python configuration file:
+
+    $ nosetests -s --tc-file example_cfg.py --tc-format python
+    
+Overriding a configuration value on the command line:
+
+    $ nosetests -s --tc-file example_cfg.ini --tc="myvalue.sub:'bar'"
+
+Overriding multiple key:value pairs:
+
+    $ nosetests -s --tc-file example_cfg.ini --tc="myvalue.sub:'bar'" \
+        --tc='myvalue.sub2:'baz'" --tc="myvalue.sub3:'bar3'"
+
+
+``Warning``: When using the --tc= flag, you can pass it in as many times as
+you want to override as many keys/values as needed, however you can not use it
+to add in new keys: The configuration key must already be defined. The format
+is in ``parent.child = value`` format - the periods are translated into keys 
+within the config dict.
+
+
+Changes & News
+--------------
+
+0.3: 
+    Fix documentation examples per Kumar's feedback.
+
+0.2:
+    Fix pypi packaging issues
+
+0.1:
+    Initial release.  May contain bits of glass.

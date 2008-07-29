@@ -1,0 +1,4 @@
+include ACKS
+include TODO
+include docs/*
+include examples/*

@@ -1,0 +1,4 @@
+* Add in configobj support
+* Allow --tc= to add in new keys to the config dict
+* Parse a [testconfig] section from nose.cfg style files
+* Add in YAML object-creation examples (!!py)
