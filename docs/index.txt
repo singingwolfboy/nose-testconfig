@@ -22,9 +22,10 @@ faculty for passing test-specific (or test-run specific) configuration data
 to the tests being executed.
 
 Currently configuration files in the following formats are supported:
-* YAML (via `PyYAML <http://pypi.python.org/pypi/PyYAML/>`_)
-* INI (via `ConfigParser <http://docs.python.org/lib/module-ConfigParser.html>`_)
-* Pure Python (via Exec)
+
+- YAML (via `PyYAML <http://pypi.python.org/pypi/PyYAML/>`_)
+- INI (via `ConfigParser <http://docs.python.org/lib/module-ConfigParser.html>`_)
+- Pure Python (via Exec)
 
 The plugin is ``meant`` to be flexible, ergo the support of exec'ing arbitrary
 python files as configuration files with no checks. The default format is 
@@ -34,24 +35,18 @@ The plugin provides a method of overriding certain parameters from the command
 line (assuming that the main "config" object is a dict) and can easily have 
 additional parsers added to it.
 
-``Warning``: By default, when parsing ini-style files, the value in the 
-key = value pair is loaded via an eval() statement - this is designed so that 
-you can put python lists or dictionaries into the values and have them parsed
-into actual data structures. This may not be desirable for some as it is both
-dangerous, and forces values to be valid python syntax.
-
 Test Usage
 ----------
 
 For now (until something better comes along) tests can import the "config" 
-singleton from testconfig:
+singleton from testconfig::
 
     from testconfig import config
 
 By default, YAML files parse into a nested dictionary, and ConfigParser ini
 files are also collapsed into a nested dictionary for foo[bar][baz] style
 access. Tests can obviously access configuration data by referencing the 
-relevant dictionary keys:
+relevant dictionary keys::
 
     from testconfig import config
     def test_foo():
@@ -75,31 +70,31 @@ python-specific objects and all of the other YAML creamy goodness.
 Defining a configuration file
 -----------------------------
 
-Simple ConfigParser style:
+Simple ConfigParser style::
 
     [myapp_servers]
     main_server = 10.1.1.1
     secondary_server = 10.1.1.2
 
-So your tests access the config options like this:
+So your tests access the config options like this::
 
     from testconfig import config
     def test_foo():
         main_server = config['myapp_servers']['main_server']
 
-YAML style configuration:
+YAML style configuration::
     myapp:
         servers:
             main_server: 10.1.1.1
             secondary_server: 10.1.1.2
 
-And your tests can access it thus:
+And your tests can access it thus::
 
     from testconfig import config
     def test_foo():
         main_server = config['myapp']['servers']['main_server']
 
-Python configuration file:
+Python configuration file::
 
     import socket
 
@@ -117,7 +112,7 @@ Python configuration file:
         config['main_server'] = srv
         break
 
-And lo, the config is thus:
+And lo, the config is thus::
 
     from testconfig import config
     def test_foo():
@@ -131,7 +126,7 @@ Command line options
 --------------------
 
 After it is installed, the plugin adds the following command line flags to 
-nosetests:
+nosetests::
 
     --tc-file=TESTCONFIG  Configuration file to parse and pass to tests
                           [NOSE_TEST_CONFIG_FILE]
@@ -148,23 +143,23 @@ nosetests:
                           pylons.
 
 
-Passing in an INI configuration file:
+Passing in an INI configuration file::
 
     $ nosetests -s --tc-file example_cfg.ini
 
-Passing in a YAML configuration file:
+Passing in a YAML configuration file::
 
     $ nosetests -s --tc-file example_cfg.yaml --tc-format yaml
 
-Passing in a Python configuration file:
+Passing in a Python configuration file::
 
     $ nosetests -s --tc-file example_cfg.py --tc-format python
     
-Overriding a configuration value on the command line:
+Overriding a configuration value on the command line::
 
     $ nosetests -s --tc-file example_cfg.ini --tc=myvalue.sub:bar
 
-Overriding multiple key:value pairs:
+Overriding multiple key:value pairs::
 
     $ nosetests -s --tc-file example_cfg.ini --tc=myvalue.sub:bar \
         --tc=myvalue.sub2:baz --tc=myvalue.sub3:bar3
@@ -174,7 +169,7 @@ Overriding multiple key:value pairs:
 you want to override as many keys/values as needed, however you can not use it
 to add in new keys: The configuration key must already be defined. The format
 is in ``parent.child.child = value`` format - the periods are translated into 
-keys within the config dict, for example:
+keys within the config dict, for example::
 
     myvalue.sub2:baz = config[myvalue][sub2] = baz
     
@@ -186,12 +181,11 @@ Changes & News
 
 0.4:
     * Per feedback from Kumar and others, the eval()'ing of ini-file values 
-    has been removed: allowing arbitrary python in the values was more 
-    annoying less standard then was worth it.
+      has been removed: allowing arbitrary python in the values was more 
+      annoying less standard then was worth it.
     * Added the --tc-exact command line flag, to block the exploding of 
-    name.name values into dicts-within-dicts
+      name.name values into dicts-within-dicts
     * Updated the docs to parse right.
-    * 
 
 0.3: 
     Fix documentation examples per Kumar's feedback.
