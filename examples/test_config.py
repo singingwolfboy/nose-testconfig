@@ -1,5 +1,6 @@
 
 from testconfig import config
+import pprint
 
 def test_ohnoes():
-    print config
+    pprint.pprint(config)

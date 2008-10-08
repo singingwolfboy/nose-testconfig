@@ -2,6 +2,8 @@
 testconfig
 ==========
 
+* Project hosting: <http://code.google.com/p/nose-testconfig/>
+
 .. contents::
 
 About
