@@ -7,6 +7,26 @@ import logging
 
 log = logging.getLogger(__name__)
 
+warning = "Cannot access the test config because the plugin has not \
+been activated.  Did you specify --tc or any other command line option?"
+
+class _uninitialized_config(object):
+    """a dummy config until the plugin creates a real one"""
+    def _warn(self):
+        import warnings
+        warnings.warn(warning, RuntimeWarning)
+
+    def __getitem__(self, item):
+        self._warn()
+        return None
+
+    def get(self, item, default=None):
+        self._warn()
+        return None
+
+
+config = _uninitialized_config()
+
 
 def load_yaml(yaml_file):
     """ Load the passed in yaml configuration file """
@@ -87,7 +107,8 @@ class TestConfig(Plugin):
         if options.testconfigformat:
             self.format = options.testconfigformat
             if self.format not in self.valid_loaders.keys():
-                raise Exception('%s is not a valid configuration file format' % self.format)
+                raise Exception('%s is not a valid configuration file format' \
+                                                                % self.format)
 
         # Load the configuration file:
         self.valid_loaders[self.format](options.testconfig)
