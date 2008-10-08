@@ -51,8 +51,7 @@ def load_ini(ini_file):
     for section in tmpconfig.sections():
         config[section] = {}
         for option in tmpconfig.options(section):
-            val = eval(tmpconfig.get(section, option))
-            config[section][option] = val
+            config[section][option] = tmpconfig.get(section, option)
 
 
 def load_python(py_file):
@@ -87,12 +86,18 @@ class TestConfig(Plugin):
             dest="testconfigformat",
             help="Test config file format, default is configparser ini format"
                  " [NOSE_TEST_CONFIG_FILE_FORMAT]")
-
         parser.add_option(
             "--tc", action="append", 
             dest="overrides",
             default = [],
             help="Option:Value specific overrides.")
+        parser.add_option(
+            "--tc-exact", action="store_true", 
+            dest="exact",
+            default = False,
+            help="Optional: Do not explode periods in override keys to "
+                 "individual keys within the config dict, instead treat them"
+                 " as config[my.toplevel.key] ala sqlalchemy.url in pylons")
 
     def configure(self, options, noseconfig):
         """ Call the super and then validate and call the relevant parser for
@@ -118,7 +123,10 @@ class TestConfig(Plugin):
             overrides = tolist(options.overrides)
             for override in overrides:
                 keys, val = override.split(":")
-                ns = ''.join(['["%s"]' % i for i in keys.split(".") ])
-                # BUG: Breaks if the config value you're overriding is not
-                # defined in the configuration file already. TBD
-                exec('config%s = eval("%s")' % (ns, val))
+                if options.exact:
+                    config[keys] = val
+                else:                    
+                    ns = ''.join(['["%s"]' % i for i in keys.split(".") ])
+                    # BUG: Breaks if the config value you're overriding is not
+                    # defined in the configuration file already. TBD
+                    exec('config%s = "%s"' % (ns, val))

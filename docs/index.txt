@@ -22,8 +22,8 @@ faculty for passing test-specific (or test-run specific) configuration data
 to the tests being executed.
 
 Currently configuration files in the following formats are supported:
-* YAML (via `Pyyaml <http://pypi.python.org/pypi/PyYAML/>`)
-* INI (via `ConfigParser <http://docs.python.org/lib/module-ConfigParser.html>`)
+* YAML (via `PyYAML <http://pypi.python.org/pypi/PyYAML/>`_)
+* INI (via `ConfigParser <http://docs.python.org/lib/module-ConfigParser.html>`_)
 * Pure Python (via Exec)
 
 The plugin is ``meant`` to be flexible, ergo the support of exec'ing arbitrary
@@ -86,10 +86,6 @@ So your tests access the config options like this:
     from testconfig import config
     def test_foo():
         main_server = config['myapp_servers']['main_server']
-        
-If you wanted, you could set main_server to be a list named "main_servers"
-like this: main_servers = ['10.1.1.1', '10.2.1.1'] - this would in turn be
-eval'ed into a proper python list.
 
 YAML style configuration:
     myapp:
@@ -127,6 +123,9 @@ And lo, the config is thus:
     def test_foo():
         main_server = config['main_server']
 
+If you need to put python code into your configuration, you either need to use
+the python-config file faculties, or you need to use the !!python tags within
+PyYAML/YAML - raw ini files no longer have any sort of eval magic.
 
 Command line options
 --------------------
@@ -143,6 +142,11 @@ nosetests:
 
     --tc=OVERRIDES        Option:Value specific overrides.
 
+    --tc-exact            Optional: Do not explode periods in override keys to
+                          individual keys within the config dict, instead treat
+                          them as config[my.toplevel.key] ala sqlalchemy.url in
+                          pylons.
+
 
 Passing in an INI configuration file:
 
@@ -158,23 +162,36 @@ Passing in a Python configuration file:
     
 Overriding a configuration value on the command line:
 
-    $ nosetests -s --tc-file example_cfg.ini --tc="myvalue.sub:'bar'"
+    $ nosetests -s --tc-file example_cfg.ini --tc=myvalue.sub:bar
 
 Overriding multiple key:value pairs:
 
-    $ nosetests -s --tc-file example_cfg.ini --tc="myvalue.sub:'bar'" \
-        --tc='myvalue.sub2:'baz'" --tc="myvalue.sub3:'bar3'"
+    $ nosetests -s --tc-file example_cfg.ini --tc=myvalue.sub:bar \
+        --tc=myvalue.sub2:baz --tc=myvalue.sub3:bar3
 
 
 ``Warning``: When using the --tc= flag, you can pass it in as many times as
 you want to override as many keys/values as needed, however you can not use it
 to add in new keys: The configuration key must already be defined. The format
-is in ``parent.child = value`` format - the periods are translated into keys 
-within the config dict.
+is in ``parent.child.child = value`` format - the periods are translated into 
+keys within the config dict, for example:
 
+    myvalue.sub2:baz = config[myvalue][sub2] = baz
+    
+You can override the explosion of the periods by passing in the --tc-exact 
+argument on the command line.
 
 Changes & News
 --------------
+
+0.4:
+    * Per feedback from Kumar and others, the eval()'ing of ini-file values 
+    has been removed: allowing arbitrary python in the values was more 
+    annoying less standard then was worth it.
+    * Added the --tc-exact command line flag, to block the exploding of 
+    name.name values into dicts-within-dicts
+    * Updated the docs to parse right.
+    * 
 
 0.3: 
     Fix documentation examples per Kumar's feedback.
