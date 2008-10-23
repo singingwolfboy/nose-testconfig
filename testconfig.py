@@ -58,7 +58,7 @@ def load_python(py_file):
     """ This will exec the defined python file into the config variable - 
     the implicit assumption is that the python is safe, well formed and will
     not do anything bad. This is also dangerous. """
-    exec(open(py_file, 'r').read())
+    exec(open(py_file, 'r'))
 
 
 class TestConfig(Plugin):

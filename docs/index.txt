@@ -179,6 +179,9 @@ argument on the command line.
 Changes & News
 --------------
 
+0.5:
+    * Fix a bug in the python config file parsing reported by Christopher Hesse
+
 0.4:
     * Per feedback from Kumar and others, the eval()'ing of ini-file values 
       has been removed: allowing arbitrary python in the values was more 
