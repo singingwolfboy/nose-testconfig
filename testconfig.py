@@ -130,3 +130,16 @@ class TestConfig(Plugin):
                     # BUG: Breaks if the config value you're overriding is not
                     # defined in the configuration file already. TBD
                     exec('config%s = "%s"' % (ns, val))
+
+
+# Use an environment hack to allow people to set a config file to auto-load
+# in case they want to put tests they write through pychecker or any other
+# syntax thing which does an execute on the file.
+if 'NOSE_TESTCONFIG_AUTOLOAD_YAML' in os.environ:
+    load_yaml(os.environ['NOSE_TESTCONFIG_AUTOLOAD_YAML'])
+
+if 'NOSE_TESTCONFIG_AUTOLOAD_INI' in os.environ:
+    load_ini(os.environ['NOSE_TESTCONFIG_AUTOLOAD_INI'])
+
+if 'NOSE_TESTCONFIG_AUTOLOAD_PYTHON' in os.environ:
+    load_python(os.environ['NOSE_TESTCONFIG_AUTOLOAD_PYTHON'])

@@ -176,8 +176,41 @@ keys within the config dict, for example::
 You can override the explosion of the periods by passing in the --tc-exact 
 argument on the command line.
 
+Special environment variables
+-----------------------------
+
+If you have a test which performs an import like this::
+
+    from testconfig import config
+
+Then you know you can not run your test through a tool like pychecker as 
+pychecker executes the file you are scanning, an warning is thrown and any use
+of the config dict will cause an exception.
+
+To work around this, I've added three environment variable checks which, if 
+set will cause a given configuration file to be auto-loaded into the module
+and the config dict will be populated. These are::
+
+    NOSE_TESTCONFIG_AUTOLOAD_YAML
+    NOSE_TESTCONFIG_AUTOLOAD_INI
+    NOSE_TESTCONFIG_AUTOLOAD_PYTHON
+
+Setting one of these to ``full path`` of the target configuration file in your
+environment/editor/etc will make it auto load that configuration file. You can
+now run it through pychecker. Much success was had!
+
+For example, I set NOSE_TESTCONFIG_AUTOLOAD_YAML to /Users/jesse/foo.yaml 
+within textmate. I can now use pychecker via control-shift-v with much win.
+
 Changes & News
 --------------
+
+0.6:
+    * Add in checking for 3 different environment variables corresponding to
+      the supported config file types. Setting one of these to the full path
+      to a given configuration file will force nose-testconfig to autoload that
+      file. Handy if you want to run a test which imports the testconfig module
+      through something like pychecker (or run it from the command line).
 
 0.5:
     * Fix a bug in the python config file parsing reported by Christopher Hesse
