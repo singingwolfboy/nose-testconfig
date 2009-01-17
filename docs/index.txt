@@ -2,7 +2,7 @@
 testconfig
 ==========
 
-* Project hosting: <http://code.google.com/p/nose-testconfig/>
+* Project hosting: <http://bitbucket.org/jnoller/nose-testconfig/>
 
 .. contents::
 
