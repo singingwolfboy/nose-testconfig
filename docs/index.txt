@@ -204,6 +204,8 @@ within textmate. I can now use pychecker via control-shift-v with much win.
 
 Changes & News
 --------------
+0.7:
+    * Add ability to handle json format.
 
 0.6:
     * Add in checking for 3 different environment variables corresponding to

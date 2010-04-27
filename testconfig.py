@@ -61,6 +61,15 @@ def load_python(py_file):
     exec(open(py_file, 'r'))
 
 
+def load_json(json_file):
+    """ This will use the json module to to read in the config json file.
+    """
+    import json
+    global config
+    with open(json_file, 'r') as handle:
+        config = json.load(handle)
+
+
 class TestConfig(Plugin):
 
     enabled = False
@@ -70,7 +79,7 @@ class TestConfig(Plugin):
     env_opt = "NOSE_TEST_CONFIG_FILE"
     format = "ini"
     valid_loaders = { 'yaml' : load_yaml, 'ini' : load_ini,
-                      'python' : load_python }
+                      'python' : load_python, 'json': load_json }
 
     def options(self, parser, env=os.environ):
         """ Define the command line options for the plugin. """
@@ -87,12 +96,12 @@ class TestConfig(Plugin):
             help="Test config file format, default is configparser ini format"
                  " [NOSE_TEST_CONFIG_FILE_FORMAT]")
         parser.add_option(
-            "--tc", action="append", 
+            "--tc", action="append",
             dest="overrides",
             default = [],
             help="Option:Value specific overrides.")
         parser.add_option(
-            "--tc-exact", action="store_true", 
+            "--tc-exact", action="store_true",
             dest="exact",
             default = False,
             help="Optional: Do not explode periods in override keys to "
@@ -143,3 +152,6 @@ if 'NOSE_TESTCONFIG_AUTOLOAD_INI' in os.environ:
 
 if 'NOSE_TESTCONFIG_AUTOLOAD_PYTHON' in os.environ:
     load_python(os.environ['NOSE_TESTCONFIG_AUTOLOAD_PYTHON'])
+
+if 'NOSE_TESTCONFIG_AUTOLOAD_JSON' in os.environ:
+    load_json(os.environ['NOSE_TESTCONFIG_AUTOLOAD_JSON'])
