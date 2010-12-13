@@ -36,6 +36,9 @@ The plugin provides a method of overriding certain parameters from the command
 line (assuming that the main "config" object is a dict) and can easily have 
 additional parsers added to it.
 
+A configuration file may not be provided. In this case, the config object is an
+emtpy dict. Any command line "overriding" paramters will be added to the dict.
+
 Test Usage
 ----------
 
@@ -160,6 +163,10 @@ Overriding a configuration value on the command line::
 
     $ nosetests -s --tc-file example_cfg.ini --tc=myvalue.sub:bar
 
+Passing paramters on the command line without specifying a configuration file::
+
+    $ nosetests -s --tc=myvalue.sub2:baz
+
 Overriding multiple key:value pairs::
 
     $ nosetests -s --tc-file example_cfg.ini --tc=myvalue.sub:bar \
@@ -167,10 +174,9 @@ Overriding multiple key:value pairs::
 
 
 ``Warning``: When using the --tc= flag, you can pass it in as many times as
-you want to override as many keys/values as needed, however you can not use it
-to add in new keys: The configuration key must already be defined. The format
-is in ``parent.child.child = value`` format - the periods are translated into 
-keys within the config dict, for example::
+you want to override as many keys/values as needed. The format is in
+``parent.child.child = value`` format - the periods are translated into keys
+within the config dict, for example::
 
     myvalue.sub2:baz = config[myvalue][sub2] = baz
     
