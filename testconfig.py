@@ -10,22 +10,7 @@ log = logging.getLogger(__name__)
 warning = "Cannot access the test config because the plugin has not \
 been activated.  Did you specify --tc or any other command line option?"
 
-class _uninitialized_config(object):
-    """a dummy config until the plugin creates a real one"""
-    def _warn(self):
-        import warnings
-        warnings.warn(warning, RuntimeWarning)
-
-    def __getitem__(self, item):
-        self._warn()
-        return None
-
-    def get(self, item, default=None):
-        self._warn()
-        return None
-
-
-config = _uninitialized_config()
+config = {}
 
 
 def load_yaml(yaml_file):
@@ -111,7 +96,7 @@ class TestConfig(Plugin):
     def configure(self, options, noseconfig):
         """ Call the super and then validate and call the relevant parser for
         the configuration file passed in """
-        if not options.testconfig:
+        if not options.testconfig and not options.overrides:
             return
         Plugin.configure(self, options, noseconfig)
 
@@ -125,20 +110,26 @@ class TestConfig(Plugin):
                                                                 % self.format)
 
         # Load the configuration file:
-        self.valid_loaders[self.format](options.testconfig)
+        if options.testconfig:
+            self.valid_loaders[self.format](options.testconfig)
 
-        if options.overrides:
-            self.overrides = []
-            overrides = tolist(options.overrides)
-            for override in overrides:
-                keys, val = override.split(":")
-                if options.exact:
-                    config[keys] = val
-                else:                    
-                    ns = ''.join(['["%s"]' % i for i in keys.split(".") ])
-                    # BUG: Breaks if the config value you're overriding is not
-                    # defined in the configuration file already. TBD
-                    exec('config%s = "%s"' % (ns, val))
+        overrides = tolist(options.overrides) or []
+        for override in overrides:
+            keys, val = override.split(":")
+            if options.exact:
+                config[keys] = val
+            else:
+                # Create all *parent* keys that may not exist in the config
+                section = config
+                keys = keys.split('.')
+                for key in keys[:-1]:
+                    if key not in section:
+                        section[key] = {}
+                    section = section[key]
+
+                # Finally assign the value to the last key
+                key = keys[-1]
+                section[key] = val
 
 
 # Use an environment hack to allow people to set a config file to auto-load
