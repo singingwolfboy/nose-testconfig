@@ -1,3 +1,5 @@
 * Add in configobj support
 * Parse a [testconfig] section from nose.cfg style files
 * Add in YAML object-creation examples (!!py)
+* Create unit tests, see http://packages.python.org/nose/plugins/testing.html
+  for testing nosetests plugins
