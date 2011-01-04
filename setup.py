@@ -21,12 +21,12 @@ setup(
     description = 'Test Configuration plugin for nosetests.',
     long_description = long_description,
     license = 'Apache License, Version 2.0',
-      classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
-        'Topic :: Software Development :: Testing',
-      ],
+    classifiers=[
+      'Development Status :: 3 - Alpha',
+      'Intended Audience :: Developers',
+      'License :: OSI Approved :: Apache Software License',
+      'Topic :: Software Development :: Testing',
+    ],
     py_modules=['testconfig'],
     packages=[''],
     package_dir={'': '.'},
