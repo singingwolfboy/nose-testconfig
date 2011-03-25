@@ -115,7 +115,7 @@ class TestConfig(Plugin):
 
         overrides = tolist(options.overrides) or []
         for override in overrides:
-            keys, val = override.split(":")
+            keys, val = override.split(":", 1)
             if options.exact:
                 config[keys] = val
             else:
