@@ -4,6 +4,7 @@ from nose.util import tolist
 import os
 import ConfigParser
 import logging
+import codecs
 
 log = logging.getLogger(__name__)
 
@@ -13,17 +14,17 @@ been activated.  Did you specify --tc or any other command line option?"
 config = {}
 
 
-def load_yaml(yaml_file):
+def load_yaml(yaml_file, encoding):
     """ Load the passed in yaml configuration file """
     try:
         import yaml
     except (ImportError):
         raise Exception('unable to import YAML package. Can not continue.')
     global config
-    config = yaml.load(open(yaml_file).read())
+    config = yaml.load(codecs.open(yaml_file, 'r', encoding).read())
 
 
-def load_ini(ini_file):
+def load_ini(ini_file, encoding):
     """ Parse and collapse a ConfigParser-Style ini file into a nested,
     eval'ing the individual values, as they are assumed to be valid
     python statement formatted """
@@ -31,7 +32,9 @@ def load_ini(ini_file):
     import ConfigParser
     global config
     tmpconfig = ConfigParser.ConfigParser()
-    tmpconfig.read(ini_file)
+    with codecs.open(ini_file, 'r', encoding) as f:
+        tmpconfig.readfp(f)
+
     config = {}
     for section in tmpconfig.sections():
         config[section] = {}
@@ -39,19 +42,19 @@ def load_ini(ini_file):
             config[section][option] = tmpconfig.get(section, option)
 
 
-def load_python(py_file):
+def load_python(py_file, encoding):
     """ This will exec the defined python file into the config variable - 
     the implicit assumption is that the python is safe, well formed and will
     not do anything bad. This is also dangerous. """
-    exec(open(py_file, 'r'))
+    exec(codecs.open(py_file, 'r', encoding).read())
 
 
-def load_json(json_file):
+def load_json(json_file, encoding):
     """ This will use the json module to to read in the config json file.
     """
     import json
     global config
-    with open(json_file, 'r') as handle:
+    with codecs.open(json_file, 'r', encoding=encoding) as handle:
         config = json.load(handle)
 
 
@@ -63,6 +66,7 @@ class TestConfig(Plugin):
 
     env_opt = "NOSE_TEST_CONFIG_FILE"
     format = "ini"
+    encoding = 'utf-8'
     valid_loaders = { 'yaml' : load_yaml, 'ini' : load_ini,
                       'python' : load_python, 'json': load_json }
 
@@ -74,6 +78,12 @@ class TestConfig(Plugin):
             dest="testconfig",
             help="Configuration file to parse and pass to tests"
                  " [NOSE_TEST_CONFIG_FILE]")
+        parser.add_option(
+            "--tc-file-encoding", action="store",
+            default=env.get('NOSE_TEST_CONFIG_FILE_ENCODING') or self.encoding, 
+            dest="testconfigencoding",
+            help="Test config file encoding, default is utf-8"
+                 " [NOSE_TEST_CONFIG_FILE_ENCODING]")
         parser.add_option(
             "--tc-format", action="store",
             default=env.get('NOSE_TEST_CONFIG_FILE_FORMAT') or self.format, 
@@ -111,7 +121,8 @@ class TestConfig(Plugin):
 
         # Load the configuration file:
         if options.testconfig:
-            self.valid_loaders[self.format](options.testconfig)
+            self.valid_loaders[self.format](options.testconfig,
+                                            options.testconfigencoding)
 
         overrides = tolist(options.overrides) or []
         for override in overrides:
