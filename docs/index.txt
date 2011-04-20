@@ -12,7 +12,7 @@ About
 Written by Jesse Noller  
 Licensed under the Apache Software License, 2.0
 
-You can install it with ``easy_install nose-testconfig``
+You can install it with ``pip install nose-testconfig``
 
 What It Does
 ------------
@@ -26,7 +26,7 @@ Currently configuration files in the following formats are supported:
 - YAML (via `PyYAML <http://pypi.python.org/pypi/PyYAML/>`_)
 - INI (via `ConfigParser <http://docs.python.org/lib/module-ConfigParser.html>`_)
 - Pure Python (via Exec)
-- JSON (via `JSON http://docs.python.org/library/json.html>`_)
+- JSON (via `JSON <http://docs.python.org/library/json.html>`_)
 
 The plugin is ``meant`` to be flexible, ergo the support of exec'ing arbitrary
 python files as configuration files with no checks. The default format is 
