@@ -2,7 +2,12 @@ from nose.plugins.base import Plugin
 from nose.util import tolist
 
 import os
-import ConfigParser
+
+try:
+    import ConfigParser
+except ImportError:
+    import configparser as ConfigParser
+
 import logging
 import codecs
 
@@ -29,7 +34,6 @@ def load_ini(ini_file, encoding):
     eval'ing the individual values, as they are assumed to be valid
     python statement formatted """
 
-    import ConfigParser
     global config
     tmpconfig = ConfigParser.ConfigParser()
     with codecs.open(ini_file, 'r', encoding) as f:
