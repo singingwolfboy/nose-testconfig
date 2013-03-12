@@ -151,13 +151,13 @@ class TestConfig(Plugin):
 # in case they want to put tests they write through pychecker or any other
 # syntax thing which does an execute on the file.
 if 'NOSE_TESTCONFIG_AUTOLOAD_YAML' in os.environ:
-    load_yaml(os.environ['NOSE_TESTCONFIG_AUTOLOAD_YAML'])
+    load_yaml(os.environ['NOSE_TESTCONFIG_AUTOLOAD_YAML'], encoding='utf-8')
 
 if 'NOSE_TESTCONFIG_AUTOLOAD_INI' in os.environ:
-    load_ini(os.environ['NOSE_TESTCONFIG_AUTOLOAD_INI'])
+    load_ini(os.environ['NOSE_TESTCONFIG_AUTOLOAD_INI'], encoding='utf-8')
 
 if 'NOSE_TESTCONFIG_AUTOLOAD_PYTHON' in os.environ:
-    load_python(os.environ['NOSE_TESTCONFIG_AUTOLOAD_PYTHON'])
+    load_python(os.environ['NOSE_TESTCONFIG_AUTOLOAD_PYTHON'], encoding='utf-8')
 
 if 'NOSE_TESTCONFIG_AUTOLOAD_JSON' in os.environ:
-    load_json(os.environ['NOSE_TESTCONFIG_AUTOLOAD_JSON'])
+    load_json(os.environ['NOSE_TESTCONFIG_AUTOLOAD_JSON'], encoding='utf-8')
