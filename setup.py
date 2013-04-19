@@ -15,7 +15,7 @@ f.close()
 
 setup(
     name='nose-testconfig',
-    version='0.8',
+    version='0.9',
     author='Jesse Noller',
     author_email = 'jnoller@gmail.com',
     description = 'Test Configuration plugin for nosetests.',

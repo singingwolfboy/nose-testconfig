@@ -212,6 +212,12 @@ within textmate. I can now use pychecker via control-shift-v with much win.
 
 Changes & News
 --------------
+0.9:
+    * Python 3 compatible
+    * fix loading of data files when environment variables
+      NOSE_TESTCONFIG_AUTOLOAD_* are specified.
+    * added tests
+
 0.8:
     * unicode support for config files (gjednaszewski/dhellmann)
     * colons are allowed in user's arguments, such as --tc url:127.0.0.1:5000 (aconrad)
